@@ -1,0 +1,7 @@
+_src/raw/
+_src/*.png
+_src/*.jpg
+_src/*.json
+_src/*.html
+_src/*.txt
+_src/dl*.txt

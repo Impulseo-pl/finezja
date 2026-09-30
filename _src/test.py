@@ -1,0 +1,26 @@
+from playwright.sync_api import sync_playwright
+B='http://127.0.0.1:8124/finezja/'
+with sync_playwright() as p:
+    b=p.chromium.launch(executable_path=r"C:\Program Files\Google\Chrome\Application\chrome.exe")
+    pg=b.new_page(viewport={'width':1440,'height':900});errs=[]
+    pg.on('pageerror',lambda e:errs.append(str(e)))
+    pg.on('console',lambda m:m.type=='error' and errs.append(m.text))
+    pg.goto(B+'catering/?team=1',wait_until='networkidle')
+    for i in range(3): pg.click('[data-id=m1] button[data-d="+"]')
+    pg.click('[data-id=m7] button[data-d="+"]')
+    print('sum',pg.inner_text('#cart-sum'),'|',pg.inner_text('#cart-note'))
+    for i in range(10): pg.click('[data-id=m44] button[data-d="+"]')
+    print('sum',pg.inner_text('#cart-sum'),'|',pg.inner_text('#cart-note'))
+    pg.fill('#c-date','2026-10-10');pg.dispatch_event('#c-date','change');print('hint',pg.inner_text('#c-hint'))
+    pg.fill('#c-date','2026-10-06');pg.dispatch_event('#c-date','change');print('hint',pg.inner_text('#c-hint'))
+    pg.goto(B+'wesele/?team=1');pg.fill('#w-g','140');pg.dispatch_event('#w-g','input');print('wesele',pg.inner_text('#w-min'),pg.inner_text('#w-max'),pg.get_attribute('#w-link','href'))
+    pg.goto(B+'kontakt/?okazja=komunia&goscie=80&team=1');print('form',pg.eval_on_selector('select[name=okazja]','e=>e.value'),pg.eval_on_selector('input[name=goscie]','e=>e.value'))
+    pg.fill('input[name=data]','2027-06-12');pg.dispatch_event('input[name=data]','change');print('t',pg.inner_text('#t-hint'))
+    pg.click('button[type=submit]');print('msg',pg.inner_text('.form-msg'))
+    pg.goto(B+'galeria/?team=1',wait_until='networkidle');pg.click('button[data-f=slodki]')
+    print('vis',pg.eval_on_selector_all('.masonry a','a=>a.filter(x=>!x.hidden).length'))
+    pg.click('.masonry a:not([hidden])');print('lb',pg.eval_on_selector('.lb','e=>e.className'),pg.inner_text('.lb p'))
+    pg.keyboard.press('ArrowRight');print('lb2',pg.inner_text('.lb p'));pg.keyboard.press('Escape')
+    pg.goto(B+'?team=1');print('cd',pg.inner_text('[data-countdown]'))
+    print('ERR',errs)
+    b.close()
